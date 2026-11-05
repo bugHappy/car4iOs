@@ -20,7 +20,7 @@ struct MyCarView: View {
                     }
                     Text(ble.config.isLock ? "已锁车" : "已解锁")
                         .font(.largeTitle.bold())
-                        .foregroundStyle(ble.config.isLock ? .primary : .orange)
+                        .foregroundStyle(ble.config.isLock ? Color.primary : Color.orange)
                     HStack(spacing: 16) {
                         Label("\(ble.rssi) dBm", systemImage: "antenna.radiowaves.left.and.right")
                         Label(proximityText, systemImage: "figure.walk")

@@ -61,7 +61,9 @@ final class BLEManager: NSObject, ObservableObject {
         // 阈值修改时同步到分析器
         config.$rssiPosThreshold
             .combineLatest(config.$rssiNegThreshold)
-            .sink { [weak self] pos, neg in self?.analyzer.setThreshold(pos: pos, neg: neg) }
+            .sink { [weak self] thresholds in
+                self?.analyzer.setThreshold(pos: thresholds.0, neg: thresholds.1)
+            }
             .store(in: &configObservers)
         // config(嵌套 ObservableObject)的变化转发给视图层,保证 UI 自动刷新
         config.objectWillChange
