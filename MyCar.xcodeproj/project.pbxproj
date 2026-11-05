@@ -6,9 +6,22 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1A00000000000000000010 /* Exceptions for "MyCar" folder in "MyCar" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1A00000000000000000006 /* MyCar */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1A00000000000000000001 /* MyCar */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1A00000000000000000010 /* Exceptions for "MyCar" folder in "MyCar" target */,
+			);
 			path = MyCar;
 			sourceTree = "<group>";
 		};
