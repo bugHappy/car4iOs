@@ -1,0 +1,63 @@
+name: iOS Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build unsigned IPA
+    # 工程为 Xcode 16 的文件夹同步格式(objectVersion 77),必须 macOS + Xcode 16+
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          xcodebuild -list -project MyCar.xcodeproj
+
+      # 未配置开发者证书,CI 一律不签名:
+      # 产物是未签名 .app,打包成 ipa 后需用 Sideloadly / AltStore 等工具自签安装
+      - name: Build
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project MyCar.xcodeproj \
+            -scheme MyCar \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            ONLY_ACTIVE_ARCH=NO
+
+      - name: Package unsigned IPA
+        run: |
+          APP_PATH="build/Build/Products/Release-iphoneos/MyCar.app"
+          test -d "$APP_PATH"
+          rm -rf Payload MyCar-unsigned.ipa
+          mkdir -p Payload
+          cp -R "$APP_PATH" Payload/
+          zip -qr MyCar-unsigned.ipa Payload
+          ls -lh MyCar-unsigned.ipa
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MyCar-unsigned-ipa
+          path: MyCar-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 30
